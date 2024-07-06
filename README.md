@@ -57,7 +57,7 @@ kube-opencti/
 
 1. Clone o repositório:
 ```bash
-git clone git@github.com:bob-reis/opencti-kubernetes.git
+git clone https://github.com/bob-reis/opencti-kubernetes.git
 ```
 
 2. Configure os Secrets e fique atento para as trocas de senhas e tokens
