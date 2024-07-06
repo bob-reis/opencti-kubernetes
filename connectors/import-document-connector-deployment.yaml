@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-import-document
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-import-document
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-import-document
+    spec:
+      containers:
+        - name: opencti-connector-import-document
+          image: opencti/connector-import-document:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "8105c058-0af4-4d44-abf6-d3492409075d"
+            - name: CONNECTOR_TYPE
+              value: "INTERNAL_IMPORT_FILE"
+            - name: CONNECTOR_NAME
+              value: "ImportDocument"
+            - name: CONNECTOR_VALIDATE_BEFORE_IMPORT
+              value: "true"
+            - name: CONNECTOR_SCOPE
+              value: "application/pdf,text/plain,text/html"
+            - name: CONNECTOR_AUTO
+              value: "true"
+            - name: CONNECTOR_ONLY_CONTEXTUAL
+              value: "false"
+            - name: CONNECTOR_CONFIDENCE_LEVEL
+              value: "15"
+            - name: IMPORT_DOCUMENT_CREATE_INDICATOR
+              value: "true"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"

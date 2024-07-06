@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        command: ["sh", "-c", "chmod -R 777 /usr/share/elasticsearch/data"]
+        volumeMounts:
+        - name: esdata
+          mountPath: /usr/share/elasticsearch/data
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+        env:
+        - name: discovery.type
+          value: single-node
+        - name: xpack.ml.enabled
+          value: "false"
+        - name: xpack.security.enabled
+          value: "false"
+        - name: thread_pool.search.queue_size
+          value: "5000"
+        - name: logger.org.elasticsearch.discovery
+          value: ERROR
+        - name: ES_JAVA_OPTS
+          value: "-Xms4g -Xmx4g"
+        volumeMounts:
+        - name: esdata
+          mountPath: /usr/share/elasticsearch/data
+      volumes:
+      - name: esdata
+        persistentVolumeClaim:
+          claimName: elasticsearch-pvc

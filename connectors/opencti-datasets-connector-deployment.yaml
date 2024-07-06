@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-opencti
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-opencti
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-opencti
+    spec:
+      containers:
+        - name: opencti-connector-opencti
+          image: opencti/connector-opencti:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "8258e0fd-70be-4e35-b1ae-283024186eea"
+            - name: CONNECTOR_NAME
+              value: "OpenCTI"
+            - name: CONNECTOR_SCOPE
+              value: "marking-definition,identity,location"
+            - name: CONNECTOR_CONFIDENCE_LEVEL
+              value: "100"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: CONNECTOR_UPDATE_EXISTING_DATA
+              value: "true"
+            - name: CONNECTOR_RUN_AND_TERMINATE
+              value: "false"
+            - name: CONFIG_SECTORS_FILE_URL
+              value: "https://raw.githubusercontent.com/OpenCTI-Platform/datasets/master/data/sectors.json"
+            - name: CONFIG_GEOGRAPHY_FILE_URL
+              value: "https://raw.githubusercontent.com/OpenCTI-Platform/datasets/master/data/geography.json"
+            - name: CONFIG_COMPANIES_FILE_URL
+              value: "https://raw.githubusercontent.com/OpenCTI-Platform/datasets/master/data/companies.json"
+            - name: CONFIG_REMOVE_CREATOR
+              value: "false"
+            - name: CONFIG_INTERVAL
+              value: "7"

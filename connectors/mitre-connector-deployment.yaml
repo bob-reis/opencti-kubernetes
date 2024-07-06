@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-mitre
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-mitre
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-mitre
+    spec:
+      containers:
+        - name: opencti-connector-mitre
+          image: opencti/connector-mitre:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "82d88e4a-408c-406b-ba36-ee6bb48130a9"
+            - name: CONNECTOR_NAME
+              value: "Mitre"
+            - name: CONNECTOR_SCOPE
+              value: "tool,report,malware,identity,campaign,intrusion-set,attack-pattern,course-of-action,x-mitre-data-source,x-mitre-data-component,x-mitre-matrix,x-mitre-tactic,x-mitre-collection"
+            - name: CONNECTOR_CONFIDENCE_LEVEL
+              value: "75"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: CONNECTOR_UPDATE_EXISTING_DATA
+              value: "false"
+            - name: CONNECTOR_RUN_AND_TERMINATE
+              value: "false"
+            - name: MITRE_REMOVE_STATEMENT_MARKING
+              value: "true"
+            - name: MITRE_INTERVAL
+              value: "7"

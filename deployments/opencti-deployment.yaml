@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti
+  template:
+    metadata:
+      labels:
+        app: opencti
+    spec:
+      containers:
+      - name: opencti
+        image: opencti/platform:6.2.1
+        ports:
+          - containerPort: 8080
+        env:
+          - name: NODE_OPTIONS
+            value: --max-old-space-size=8096
+          - name: APP__PORT
+            value: "8080"
+          - name: APP__BASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-base-url
+          - name: APP__ADMIN__EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-admin-email
+          - name: APP__ADMIN__PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-admin-password
+          - name: APP__ADMIN__TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-admin-token
+          - name: REDIS__HOSTNAME
+            value: redis
+          - name: REDIS__PORT
+            value: "6379"
+          - name: ELASTICSEARCH__URL
+            value: "http://elasticsearch:9200"
+          - name: MINIO__ENDPOINT
+            value: minio
+          - name: MINIO__PORT
+            value: "9000"
+          - name: MINIO__USE_SSL
+            value: "false"
+          - name: MINIO__ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: minio-user
+          - name: MINIO__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: minio-password
+          - name: RABBITMQ__HOSTNAME
+            value: rabbitmq
+          - name: RABBITMQ__PORT
+            value: "5672"
+          - name: RABBITMQ__PORT_MANAGEMENT
+            value: "15672"
+          - name: RABBITMQ__MANAGEMENT_SSL
+            value: "false"
+          - name: RABBITMQ__USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-secrets
+                key: rabbitmq-user
+          - name: RABBITMQ__PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-secrets
+                key: rabbitmq-password
+          - name: SMTP__HOSTNAME
+            value: localhost
+          - name: SMTP__PORT
+            value: "25"
+          - name: PROVIDERS__LOCAL__STRATEGY
+            value: LocalStrategy
+      volumes:
+        - name: opencti-data
+          emptyDir: {}

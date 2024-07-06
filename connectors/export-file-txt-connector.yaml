@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-export-file-txt
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-export-file-txt
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-export-file-txt
+    spec:
+      containers:
+        - name: opencti-connector-export-file-txt
+          image: opencti/connector-export-file-txt:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "1c994218-14e0-4642-b8a0-70792bdcb9d0"
+            - name: CONNECTOR_TYPE
+              value: "INTERNAL_EXPORT_FILE"
+            - name: CONNECTOR_NAME
+              value: "ExportFileTxt"
+            - name: CONNECTOR_SCOPE
+              value: "text/plain"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"

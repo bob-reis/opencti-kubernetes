@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-worker
+  namespace: kube-opencti
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: opencti-worker
+  template:
+    metadata:
+      labels:
+        app: opencti-worker
+    spec:
+      containers:
+      - name: opencti-worker
+        image: opencti/worker:6.2.1
+        env:
+          - name: OPENCTI_URL
+            value: "http://opencti:8080"
+          - name: OPENCTI_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-admin-token
+          - name: WORKER_LOG_LEVEL
+            value: "info"
+      restartPolicy: Always

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-abuseipdb
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-abuseipdb
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-abuseipdb
+    spec:
+      containers:
+        - name: opencti-connector-abuseipdb
+          image: opencti/connector-abuseipdb-ipblacklist:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "abuseipdb-connector"
+            - name: CONNECTOR_TYPE
+              value: "EXTERNAL_IMPORT"
+            - name: CONNECTOR_NAME
+              value: "AbuseIPDB"
+            - name: CONNECTOR_SCOPE
+              value: "ip"
+            - name: CONNECTOR_CONFIDENCE_LEVEL
+              value: "3"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: ABUSEIPDB_API_KEY
+              value: "<sua key aqui>"
+            - name: ABUSEIPDB_URL
+              value: "https://api.abuseipdb.com/api/v2/blacklist"
+            - name: ABUSEIPDB_SCORE
+              value: "100"
+            - name: ABUSEIPDB_LIMIT
+              value: "10000"
+            - name: ABUSEIPDB_INTERVAL
+              value: "2"  # Intervalo de 2 dias

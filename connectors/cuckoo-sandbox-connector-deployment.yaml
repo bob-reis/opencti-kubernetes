@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-cuckoo-sandbox
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-cuckoo-sandbox
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-cuckoo-sandbox
+    spec:
+      containers:
+        - name: opencti-connector-cuckoo-sandbox
+          image: opencti/connector-cuckoo:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "9cfa4180-45db-4ae6-ada0-9680c3a12fd8"
+            - name: CONNECTOR_NAME
+              value: "CuckooSandbox"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: CUCKOO_CREATE_INDICATORS
+              value: "true"
+            - name: CUCKOO_ENABLE_NETWORK_TRAFFIC
+              value: "false"
+            - name: CUCKOO_ENABLE_REGISTRY_KEYS
+              value: "false"
+            - name: CUCKOO_API_URL
+              value: "https://<CHANGEME>/api/"
+            - name: CUCKOO_BASE_URL
+              value: "https://<CHANGEME>/cuckoo/"
+            - name: CUCKOO_INTERVAL
+              value: "30"
+            - name: CUCKOO_START_TASK_ID
+              value: "0"
+            - name: CUCKOO_REPORT_SCORE
+              value: "7"
+            - name: VERIFY_SSL
+              value: "true"

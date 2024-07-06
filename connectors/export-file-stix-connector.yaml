@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-export-file-stix
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-export-file-stix
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-export-file-stix
+    spec:
+      containers:
+        - name: opencti-connector-export-file-stix
+          image: opencti/connector-export-file-stix:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "9b34c600-9812-4a70-9279-e6dfe3d9ac57"
+            - name: CONNECTOR_TYPE
+              value: "INTERNAL_EXPORT_FILE"
+            - name: CONNECTOR_NAME
+              value: "ExportFileStix2"
+            - name: CONNECTOR_SCOPE
+              value: "application/json"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"

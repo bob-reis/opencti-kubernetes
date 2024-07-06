@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-alienvault
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-alienvault
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-alienvault
+    spec:
+      containers:
+      - name: opencti-connector-alienvault
+        image: opencti/connector-alienvault:6.2.1
+        env:
+          - name: OPENCTI_URL
+            value: "http://opencti:8080"
+          - name: OPENCTI_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: opencti-secrets
+                key: opencti-admin-token
+          - name: CONNECTOR_ID
+            value: "b2b90a24-e3f0-4169-9df5-5411b561f05e"
+          - name: CONNECTOR_NAME
+            value: "AlienVault"
+          - name: CONNECTOR_SCOPE
+            value: "alienvault"
+          - name: CONNECTOR_CONFIDENCE_LEVEL
+            value: "15"
+          - name: CONNECTOR_LOG_LEVEL
+            value: "error"
+          - name: ALIENVAULT_BASE_URL
+            value: "https://otx.alienvault.com"
+          - name: ALIENVAULT_API_KEY
+            value: "<sua key aqui>"
+          - name: ALIENVAULT_TLP
+            value: "White"
+          - name: ALIENVAULT_CREATE_OBSERVABLES
+            value: "true"
+          - name: ALIENVAULT_CREATE_INDICATORS
+            value: "true"
+          - name: ALIENVAULT_PULSE_START_TIMESTAMP
+            value: "2022-05-01T00:00:00"
+          - name: ALIENVAULT_REPORT_TYPE
+            value: "threat-report"
+          - name: ALIENVAULT_REPORT_STATUS
+            value: "New"
+          - name: ALIENVAULT_GUESS_MALWARE
+            value: "false"
+          - name: ALIENVAULT_GUESS_CVE
+            value: "false"
+          - name: ALIENVAULT_EXCLUDED_PULSE_INDICATOR_TYPES
+            value: "FileHash-MD5,FileHash-SHA1"
+          - name: ALIENVAULT_ENABLE_RELATIONSHIPS
+            value: "true"
+          - name: ALIENVAULT_ENABLE_ATTACK_PATTERNS_INDICATES
+            value: "false"
+          - name: ALIENVAULT_INTERVAL_SEC
+            value: "1800"

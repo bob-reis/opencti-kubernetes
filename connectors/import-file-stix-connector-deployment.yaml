@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-import-file-stix
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-import-file-stix
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-import-file-stix
+    spec:
+      containers:
+        - name: opencti-connector-import-file-stix
+          image: opencti/connector-import-file-stix:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "c2910c13-1ca3-4839-a808-167048552b7b"
+            - name: CONNECTOR_TYPE
+              value: "INTERNAL_IMPORT_FILE"
+            - name: CONNECTOR_NAME
+              value: "ImportFileStix"
+            - name: CONNECTOR_SCOPE
+              value: "application/json,text/xml"
+            - name: CONNECTOR_AUTO
+              value: "true"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-malpedia
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-malpedia
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-malpedia
+    spec:
+      containers:
+        - name: opencti-connector-malpedia
+          image: opencti/connector-malpedia:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "f3bd0f40-8b9b-4e2c-a6c8-c6374d4e6080"
+            - name: CONNECTOR_NAME
+              value: "Malpedia"
+            - name: CONNECTOR_SCOPE
+              value: "malpedia"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: CONNECTOR_EXPOSE_METRICS
+              value: "false"
+            - name: CONNECTOR_UPDATE_EXISTING_DAT
+              value: "false"
+            - name: MALPEDIA_INTERVAL_SEC
+              value: "86400"
+            - name: MALPEDIA_IMPORT_INTRUSION_SETS
+              value: "true"
+            - name: MALPEDIA_IMPORT_YARA
+              value: "true"
+            - name: MALPEDIA_CREATE_INDICATORS
+              value: "true"
+            - name: MALPEDIA_CREATE_OBSERVABLES
+              value: "true"

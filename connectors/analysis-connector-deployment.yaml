@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-analysis
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-analysis
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-analysis
+    spec:
+      containers:
+        - name: opencti-connector-analysis
+          image: opencti/connector-import-document:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "15489c28-7ee1-4e38-a1a6-d768f0c01e02"
+            - name: CONNECTOR_TYPE
+              value: "INTERNAL_ANALYSIS"
+            - name: CONNECTOR_NAME
+              value: "ImportDocumentAnalysis"
+            - name: CONNECTOR_VALIDATE_BEFORE_IMPORT
+              value: "false"
+            - name: CONNECTOR_SCOPE
+              value: "application/pdf,text/plain,text/html"
+            - name: CONNECTOR_AUTO
+              value: "true"
+            - name: CONNECTOR_ONLY_CONTEXTUAL
+              value: "false"
+            - name: CONNECTOR_CONFIDENCE_LEVEL
+              value: "15"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"

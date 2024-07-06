@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opencti-connector-cisa
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opencti-connector-cisa
+  template:
+    metadata:
+      labels:
+        app: opencti-connector-cisa
+    spec:
+      containers:
+        - name: opencti-connector-cisa
+          image: opencti/connector-cisa-known-exploited-vulnerabilities:6.2.1
+          env:
+            - name: OPENCTI_URL
+              value: "http://opencti:8080"
+            - name: OPENCTI_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: opencti-secrets
+                  key: opencti-admin-token
+            - name: CONNECTOR_ID
+              value: "9d677a39-deb2-4187-aa4f-23b1491df846"
+            - name: CONNECTOR_NAME
+              value: "CISA Known Exploited Vulnerabilities"
+            - name: CONNECTOR_SCOPE
+              value: "cisa"
+            - name: CONNECTOR_LOG_LEVEL
+              value: "error"
+            - name: CONNECTOR_RUN_AND_TERMINATE
+              value: "false"
+            - name: CISA_CATALOG_URL
+              value: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
+            - name: CISA_CREATE_INFRASTRUCTURES
+              value: "false"
+            - name: CISA_TLP
+              value: "TLP:CLEAR"
+            - name: CISA_INTERVAL
+              value: "2"

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.13-management
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-secrets
+                key: rabbitmq-user
+          - name: RABBITMQ_DEFAULT_PASS
+            valueFrom:
+              secretKeyRef:
+                name: rabbitmq-secrets
+                key: rabbitmq-password
+          - name: RABBITMQ_NODENAME
+            value: rabbit01@localhost
+        volumeMounts:
+          - name: amqpdata
+            mountPath: /var/lib/rabbitmq
+      volumes:
+        - name: amqpdata
+          persistentVolumeClaim:
+            claimName: rabbitmq-pvc

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: kube-opencti
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:RELEASE.2024-05-28T17-19-04Z
+        env:
+          - name: MINIO_ROOT_USER
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: minio-user
+          - name: MINIO_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: minio-password
+        args:
+          - server
+          - /data
+        volumeMounts:
+          - name: s3data
+            mountPath: /data
+      volumes:
+        - name: s3data
+          persistentVolumeClaim:
+            claimName: minio-pvc
